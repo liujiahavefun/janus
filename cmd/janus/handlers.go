@@ -20,9 +20,11 @@ func Home(app config.Application) http.HandlerFunc {
 func RecoveryHandler(w http.ResponseWriter, r *http.Request, err interface{}) {
 	switch internalErr := err.(type) {
 	case *errors.Error:
-		log.Error(internalErr.Error())
+		log.WithFields(log.Fields{"code": internalErr.Code, "error": internalErr.Error()}).
+			Warning("Internal error hadled")
 		response.JSON(w, internalErr.Code, internalErr.Error())
 	default:
+		log.WithField("error", err).Error("Internal server error handled")
 		response.JSON(w, http.StatusInternalServerError, err)
 	}
 }
